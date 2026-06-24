@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
+from mcp.server.fastmcp import Context
 from pydantic import Field
 
 from mcp_server.observability.langfuse import trace_tool
@@ -9,7 +10,7 @@ from mcp_server.server import mcp
 from mcp_server.utils.azure_devops_client import get_ado_client, raise_for_status, resolve_pat_and_org
 
 _API = "api-version=7.1"
-_PAT_FIELD = Field(description="PAT Azure DevOps. Utilise AZURE_DEVOPS_DEFAULT_PAT si absent.")
+_PAT_FIELD = Field(description="PAT Azure DevOps (optionnel si azure_devops_configure a été appelé).")
 
 
 def _pr_summary(pr: dict) -> dict:
@@ -30,6 +31,7 @@ def _pr_summary(pr: dict) -> dict:
 async def azure_devops_list_prs(
     project: Annotated[str, Field(description="Nom du projet Azure DevOps")],
     repo: Annotated[str, Field(description="Nom ou ID du dépôt")],
+    ctx: Context,
     status: Annotated[
         Literal["active", "completed", "abandoned", "all"],
         Field(description="Statut des PRs à retourner"),
@@ -39,7 +41,7 @@ async def azure_devops_list_prs(
     top: Annotated[int, Field(description="Nombre maximum de PRs à retourner", ge=1, le=100)] = 25,
     pat: Annotated[str | None, _PAT_FIELD] = None,
 ) -> dict:
-    effective_pat, org_url = resolve_pat_and_org(pat)
+    effective_pat, org_url = resolve_pat_and_org(pat, ctx.session)
     async with trace_tool("azure_devops_list_prs", inputs={"project": project, "repo": repo, "status": status}):
         async with get_ado_client(effective_pat, org_url) as client:
             params = f"searchCriteria.status={status}&$top={top}&{_API}"
@@ -63,9 +65,10 @@ async def azure_devops_get_pr(
     project: Annotated[str, Field(description="Nom du projet Azure DevOps")],
     repo: Annotated[str, Field(description="Nom ou ID du dépôt")],
     pr_id: Annotated[int, Field(description="Identifiant numérique de la pull request")],
+    ctx: Context,
     pat: Annotated[str | None, _PAT_FIELD] = None,
 ) -> dict:
-    effective_pat, org_url = resolve_pat_and_org(pat)
+    effective_pat, org_url = resolve_pat_and_org(pat, ctx.session)
     async with trace_tool("azure_devops_get_pr", inputs={"project": project, "repo": repo, "pr_id": pr_id}):
         async with get_ado_client(effective_pat, org_url) as client:
             response = await client.get(
@@ -93,11 +96,12 @@ async def azure_devops_create_pr(
     title: Annotated[str, Field(description="Titre de la pull request")],
     source_branch: Annotated[str, Field(description="Branche source (sans 'refs/heads/')")],
     target_branch: Annotated[str, Field(description="Branche cible (sans 'refs/heads/')")],
+    ctx: Context,
     description: Annotated[str, Field(description="Description de la pull request")] = "",
     auto_complete: Annotated[bool, Field(description="Activer la complétion automatique après approbation")] = False,
     pat: Annotated[str | None, _PAT_FIELD] = None,
 ) -> dict:
-    effective_pat, org_url = resolve_pat_and_org(pat)
+    effective_pat, org_url = resolve_pat_and_org(pat, ctx.session)
     async with trace_tool("azure_devops_create_pr", inputs={"project": project, "repo": repo, "source": source_branch, "target": target_branch}):
         async with get_ado_client(effective_pat, org_url) as client:
             payload: dict = {
@@ -121,6 +125,7 @@ async def azure_devops_complete_pr(
     project: Annotated[str, Field(description="Nom du projet Azure DevOps")],
     repo: Annotated[str, Field(description="Nom ou ID du dépôt")],
     pr_id: Annotated[int, Field(description="Identifiant numérique de la pull request")],
+    ctx: Context,
     merge_strategy: Annotated[
         Literal["noFastForward", "squash", "rebase", "rebaseMerge"],
         Field(description="Stratégie de merge"),
@@ -128,10 +133,9 @@ async def azure_devops_complete_pr(
     delete_source_branch: Annotated[bool, Field(description="Supprimer la branche source après merge")] = False,
     pat: Annotated[str | None, _PAT_FIELD] = None,
 ) -> dict:
-    effective_pat, org_url = resolve_pat_and_org(pat)
+    effective_pat, org_url = resolve_pat_and_org(pat, ctx.session)
     async with trace_tool("azure_devops_complete_pr", inputs={"project": project, "repo": repo, "pr_id": pr_id}):
         async with get_ado_client(effective_pat, org_url) as client:
-            # Fetch current PR to get lastMergeSourceCommit (required by ADO API)
             get_response = await client.get(
                 f"/{project}/_apis/git/repositories/{repo}/pullrequests/{pr_id}?{_API}"
             )
@@ -168,12 +172,12 @@ async def azure_devops_analyze_conflicts(
     project: Annotated[str, Field(description="Nom du projet Azure DevOps")],
     repo: Annotated[str, Field(description="Nom ou ID du dépôt")],
     pr_id: Annotated[int, Field(description="Identifiant numérique de la pull request")],
+    ctx: Context,
     pat: Annotated[str | None, _PAT_FIELD] = None,
 ) -> dict:
-    effective_pat, org_url = resolve_pat_and_org(pat)
+    effective_pat, org_url = resolve_pat_and_org(pat, ctx.session)
     async with trace_tool("azure_devops_analyze_conflicts", inputs={"project": project, "repo": repo, "pr_id": pr_id}):
         async with get_ado_client(effective_pat, org_url) as client:
-            # Get PR metadata first for context
             pr_response = await client.get(
                 f"/{project}/_apis/git/repositories/{repo}/pullrequests/{pr_id}?{_API}"
             )
@@ -194,13 +198,11 @@ async def azure_devops_analyze_conflicts(
                     "message": f"Aucun conflit détecté. Statut de merge : {merge_status}.",
                 }
 
-            # Fetch conflict details
             conflicts_response = await client.get(
                 f"/{project}/_apis/git/repositories/{repo}/pullrequests/{pr_id}/conflicts?{_API}"
             )
             await raise_for_status(conflicts_response)
-            conflicts_data = conflicts_response.json()
-            raw_conflicts = conflicts_data.get("value", [])
+            raw_conflicts = conflicts_response.json().get("value", [])
 
             parsed = []
             for c in raw_conflicts:

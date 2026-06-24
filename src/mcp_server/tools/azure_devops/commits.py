@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
+from mcp.server.fastmcp import Context
 from pydantic import Field
 
 from mcp_server.observability.langfuse import trace_tool
@@ -9,7 +10,7 @@ from mcp_server.server import mcp
 from mcp_server.utils.azure_devops_client import get_ado_client, raise_for_status, resolve_pat_and_org
 
 _API = "api-version=7.1"
-_PAT_FIELD = Field(description="PAT Azure DevOps. Utilise AZURE_DEVOPS_DEFAULT_PAT si absent.")
+_PAT_FIELD = Field(description="PAT Azure DevOps (optionnel si azure_devops_configure a été appelé).")
 
 
 @mcp.tool(
@@ -34,12 +35,13 @@ async def azure_devops_push_changes(
             )
         ),
     ],
+    ctx: Context,
     pat: Annotated[str | None, _PAT_FIELD] = None,
 ) -> dict:
     if not changes:
         raise RuntimeError("La liste `changes` ne peut pas être vide.")
 
-    effective_pat, org_url = resolve_pat_and_org(pat)
+    effective_pat, org_url = resolve_pat_and_org(pat, ctx.session)
     async with trace_tool("azure_devops_push_changes", inputs={"project": project, "repo": repo, "branch": branch, "files": len(changes)}):
         async with get_ado_client(effective_pat, org_url) as client:
             # Resolve current commit ID on the target branch
@@ -53,7 +55,6 @@ async def azure_devops_push_changes(
                 raise RuntimeError(f"Branche '{branch}' introuvable dans le dépôt '{repo}'.")
             old_object_id = refs[0]["objectId"]
 
-            # Build the push payload
             commit_changes = []
             for change in changes:
                 path = change.get("path", "")
