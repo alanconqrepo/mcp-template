@@ -55,6 +55,10 @@ class Settings(BaseSettings):
     AZURE_BLOB_CONTAINER_NAME: str = ""
     AZURE_BLOB_METADATA_PREFIX: str = ""  # e.g. "metadata/" — prepended to schema/object.md
 
+    # Baserow
+    BASEROW_URL: str = "http://baserow"
+    BASEROW_TOKEN: str = ""
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:
