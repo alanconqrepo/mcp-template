@@ -81,6 +81,11 @@ class Settings(BaseSettings):
     DOCUWARE_ORGANIZATION: str = ""  # DocuWare organization name
     DOCUWARE_BLOB_PREFIX: str = "docuware/"  # blob prefix for downloaded files
 
+    # Azure DevOps
+    AZURE_DEVOPS_ORG_URL: str = "https://dev.azure.com/myorg"
+    AZURE_DEVOPS_DEFAULT_PROJECT: str = ""
+    AZURE_DEVOPS_DEFAULT_PAT: str | None = None
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:
