@@ -63,6 +63,11 @@ class Settings(BaseSettings):
     PREFECT_URL: str = "http://prefect-server:4200/api"
     PREFECT_API_KEY: str | None = None  # optional — for Prefect Cloud or secured self-hosted
 
+    # DeepL
+    DEEPL_API_KEY: str = ""
+    DEEPL_BLOB_CONTAINER: str = ""
+    DEEPL_BLOB_OUTPUT_PREFIX: str = "deepl/translated/"
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:

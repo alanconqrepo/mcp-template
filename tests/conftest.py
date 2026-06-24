@@ -1,10 +1,17 @@
 from __future__ import annotations
 
 import os
+import sys
 from contextlib import contextmanager
+from unittest.mock import MagicMock
 
 import pytest
 from starlette.testclient import TestClient
+
+# pyodbc requires a native ODBC driver that is not available in all environments.
+# Mock it at the module level so the SQL tools can be imported without the driver.
+if "pyodbc" not in sys.modules:
+    sys.modules["pyodbc"] = MagicMock()
 
 _TEST_ENV_DEFAULTS = {
     "AUTH_MODE": "api_key",
