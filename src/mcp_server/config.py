@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     LANGFUSE_PUBLIC_KEY: str | None = None
     LANGFUSE_HOST: str | None = None
 
+    # Wiki.js
+    WIKIJS_URL: str | None = None
+    WIKIJS_API_TOKEN: str | None = None
+
+
     # SQL Server — named connections stored as JSON dict
     # Example: {"default": {"host": "...", "database": "...", "username": "...", "password": "..."}}
     SQL_CONNECTIONS: dict[str, dict] = {}
@@ -50,6 +55,11 @@ class Settings(BaseSettings):
     AZURE_BLOB_CONNECTION_STRING: str = ""
     AZURE_BLOB_CONTAINER_NAME: str = ""
     AZURE_BLOB_METADATA_PREFIX: str = ""  # e.g. "metadata/" — prepended to schema/object.md
+
+    # Baserow
+    BASEROW_URL: str = "http://baserow"
+    BASEROW_TOKEN: str = ""
+
 
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
