@@ -10,3 +10,11 @@ services:
       timeout: 5s
       retries: 3
     restart: unless-stopped
+    networks:
+      - default
+      - wikijs-net
+
+networks:
+  wikijs-net:
+    external: true
+    name: ${WIKIJS_NETWORK:-wikijs_default}  # set WIKIJS_NETWORK in .env to match your Wiki.js compose network

@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     LANGFUSE_PUBLIC_KEY: str | None = None
     LANGFUSE_HOST: str | None = None
 
+    # Wiki.js
+    WIKIJS_URL: str | None = None
+    WIKIJS_API_TOKEN: str | None = None
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:
