@@ -41,6 +41,16 @@ class Settings(BaseSettings):
     LANGFUSE_PUBLIC_KEY: str | None = None
     LANGFUSE_HOST: str | None = None
 
+    # SQL Server — named connections stored as JSON dict
+    # Example: {"default": {"host": "...", "database": "...", "username": "...", "password": "..."}}
+    SQL_CONNECTIONS: dict[str, dict] = {}
+    SQL_DEFAULT_CONNECTION: str = "default"
+
+    # Azure Blob Storage — metadata .md files per table/view
+    AZURE_BLOB_CONNECTION_STRING: str = ""
+    AZURE_BLOB_CONTAINER_NAME: str = ""
+    AZURE_BLOB_METADATA_PREFIX: str = ""  # e.g. "metadata/" — prepended to schema/object.md
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:
