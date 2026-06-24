@@ -59,6 +59,10 @@ class Settings(BaseSettings):
     BASEROW_URL: str = "http://baserow"
     BASEROW_TOKEN: str = ""
 
+    # Prefect
+    PREFECT_URL: str = "http://prefect-server:4200/api"
+    PREFECT_API_KEY: str | None = None  # optional — for Prefect Cloud or secured self-hosted
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:

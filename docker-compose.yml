@@ -13,8 +13,12 @@ services:
     networks:
       - default
       - wikijs-net
+      - prefect-net
 
 networks:
   wikijs-net:
     external: true
     name: ${WIKIJS_NETWORK:-wikijs_default}  # set WIKIJS_NETWORK in .env to match your Wiki.js compose network
+  prefect-net:
+    external: true
+    name: ${PREFECT_NETWORK:-prefect_default}  # set PREFECT_NETWORK in .env to match your Prefect compose network
