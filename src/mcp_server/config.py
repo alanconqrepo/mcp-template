@@ -45,7 +45,6 @@ class Settings(BaseSettings):
     WIKIJS_URL: str | None = None
     WIKIJS_API_TOKEN: str | None = None
 
-
     # SQL Server — named connections stored as JSON dict
     # Example: {"default": {"host": "...", "database": "...", "username": "...", "password": "..."}}
     SQL_CONNECTIONS: dict[str, dict] = {}
@@ -59,7 +58,6 @@ class Settings(BaseSettings):
     # Baserow
     BASEROW_URL: str = "http://baserow"
     BASEROW_TOKEN: str = ""
-
 
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
