@@ -1,0 +1,53 @@
+from __future__ import annotations
+
+import logging
+from functools import lru_cache
+from typing import Literal
+
+from pydantic import model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+    # Server
+    SERVER_HOST: str = "0.0.0.0"
+    SERVER_PORT: int = 8000
+    LOG_LEVEL: str = "info"
+
+    # MCP
+    MCP_SERVER_NAME: str = "mcp-server-template"
+    MCP_MOUNT_PATH: str = "/mcp"
+
+    # Auth
+    AUTH_MODE: Literal["api_key", "oauth2", "none"] = "api_key"
+    API_KEYS: list[str] = []
+
+    # OAuth2
+    OAUTH2_TOKEN_URL: str | None = None
+    OAUTH2_JWKS_URL: str | None = None
+    OAUTH2_AUDIENCE: str | None = None
+    OAUTH2_ISSUER: str | None = None
+
+    # CORS
+    CORS_ORIGINS: list[str] = []
+
+    # Langfuse
+    LANGFUSE_ENABLED: bool = False
+    LANGFUSE_SECRET_KEY: str | None = None
+    LANGFUSE_PUBLIC_KEY: str | None = None
+    LANGFUSE_HOST: str | None = None
+
+    @model_validator(mode="after")
+    def validate_oauth2_config(self) -> "Settings":
+        if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:
+            raise ValueError("OAUTH2_JWKS_URL is required when AUTH_MODE=oauth2")
+        return self
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
