@@ -20,6 +20,8 @@ RUN uv pip install --system --no-dev .
 
 COPY src/ ./src/
 
+RUN python -c "import duckdb; c=duckdb.connect(); c.execute('INSTALL azure')"
+
 RUN useradd -m appuser && chown -R appuser /app
 USER appuser
 
