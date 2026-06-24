@@ -68,6 +68,12 @@ class Settings(BaseSettings):
     DEEPL_BLOB_CONTAINER: str = ""
     DEEPL_BLOB_OUTPUT_PREFIX: str = "deepl/translated/"
 
+    # Microsoft Graph / Outlook (Auth Code PKCE, multi-user)
+    AZURE_TENANT_ID: str | None = None
+    AZURE_CLIENT_ID: str | None = None
+    OUTLOOK_REDIRECT_URI: str = "http://localhost:8000/auth/outlook/callback"
+    OUTLOOK_TOKENS_DIR: str = ".outlook_tokens"
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:
