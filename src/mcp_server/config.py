@@ -86,6 +86,9 @@ class Settings(BaseSettings):
     AZURE_DEVOPS_DEFAULT_PROJECT: str = ""
     AZURE_DEVOPS_DEFAULT_PAT: str | None = None
 
+    # Anthropic
+    ANTHROPIC_API_KEY: str = ""
+
     # Apify
     APIFY_API_TOKEN: str = ""
 
