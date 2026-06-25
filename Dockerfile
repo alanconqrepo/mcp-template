@@ -22,6 +22,11 @@ COPY src/ ./src/
 
 RUN python -c "import duckdb; c=duckdb.connect(); c.execute('INSTALL azure')"
 
+# Install Chromium for Playwright in a fixed path accessible to all users
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+RUN playwright install chromium --with-deps \
+    && chmod -R a+rx /opt/pw-browsers
+
 RUN useradd -m appuser && chown -R appuser /app
 USER appuser
 
