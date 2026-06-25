@@ -13,6 +13,11 @@ from starlette.testclient import TestClient
 if "pyodbc" not in sys.modules:
     sys.modules["pyodbc"] = MagicMock()
 
+# fastmcp.Image was removed in fastmcp>=3.x — mock it so playwright tools can import.
+import fastmcp as _fastmcp
+if not hasattr(_fastmcp, "Image"):
+    _fastmcp.Image = MagicMock()
+
 _TEST_ENV_DEFAULTS = {
     "AUTH_MODE": "api_key",
     "API_KEYS": '["test-key-1"]',
