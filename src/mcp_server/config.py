@@ -94,6 +94,19 @@ class Settings(BaseSettings):
     OPENWEBUI_API_KEY: str = ""    # admin/service API key
     OPENWEBUI_TIMEOUT: int = 120   # seconds — LLM responses can be slow
 
+    # pgvector / Vector Store
+    PGVECTOR_DSN: str | None = None  # e.g. "postgresql://user:pass@localhost:5432/vectordb"
+    PGVECTOR_POOL_MIN_SIZE: int = 2
+    PGVECTOR_POOL_MAX_SIZE: int = 10
+
+    # Embedding API (OpenAI-compatible: OpenAI, Azure OpenAI, Ollama, LM Studio…)
+    EMBEDDING_BASE_URL: str = "https://api.openai.com/v1"
+    EMBEDDING_API_KEY: str = ""
+    EMBEDDING_MODEL: str = "text-embedding-3-small"
+    EMBEDDING_DIMENSIONS: int = 1536
+    EMBEDDING_BATCH_SIZE: int = 100
+    EMBEDDING_TIMEOUT: int = 30
+
     # Apify
     APIFY_API_TOKEN: str = ""
 

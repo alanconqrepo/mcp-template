@@ -101,6 +101,8 @@ def create_app() -> FastAPI:
             yield
 
             shutdown_langfuse()
+            from mcp_server.utils.pgvector_pool import close_pool
+            await close_pool()
             logger.info("MCP Server '%s' shut down", settings.MCP_SERVER_NAME)
 
     app = FastAPI(title=settings.MCP_SERVER_NAME, lifespan=lifespan)
