@@ -14,6 +14,7 @@ services:
       - default
       - wikijs-net
       - prefect-net
+      - outline-net
 
 networks:
   wikijs-net:
@@ -22,3 +23,6 @@ networks:
   prefect-net:
     external: true
     name: ${PREFECT_NETWORK:-prefect_default}  # set PREFECT_NETWORK in .env to match your Prefect compose network
+  outline-net:
+    external: true
+    name: ${OUTLINE_NETWORK:-outline_default}  # set OUTLINE_NETWORK in .env to match your Outline compose network
