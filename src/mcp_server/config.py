@@ -89,6 +89,11 @@ class Settings(BaseSettings):
     # Anthropic
     ANTHROPIC_API_KEY: str = ""
 
+    # OpenWebUI (agent-to-agent orchestration)
+    OPENWEBUI_URL: str = ""        # e.g. http://openwebui:3000
+    OPENWEBUI_API_KEY: str = ""    # admin/service API key
+    OPENWEBUI_TIMEOUT: int = 120   # seconds — LLM responses can be slow
+
     # Apify
     APIFY_API_TOKEN: str = ""
 
