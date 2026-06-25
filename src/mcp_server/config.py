@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     WIKIJS_URL: str | None = None
     WIKIJS_API_TOKEN: str | None = None
 
+    # Outline
+    OUTLINE_URL: str | None = None
+    OUTLINE_API_TOKEN: str | None = None
+
     # SQL Server — named connections stored as JSON dict
     # Example: {"default": {"host": "...", "database": "...", "username": "...", "password": "..."}}
     SQL_CONNECTIONS: dict[str, dict] = {}
