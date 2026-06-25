@@ -86,6 +86,18 @@ class Settings(BaseSettings):
     AZURE_DEVOPS_DEFAULT_PROJECT: str = ""
     AZURE_DEVOPS_DEFAULT_PAT: str | None = None
 
+    # Apify
+    APIFY_API_TOKEN: str = ""
+
+    # LinkedIn (via Apify actors) — actor IDs are overridable without code changes
+    LINKEDIN_LI_AT: str = ""  # LinkedIn session cookie for send_message
+    APIFY_ACTOR_COMPANY_INFO: str = "scrapier/linkedin-company-scraper-actor"
+    APIFY_ACTOR_COMPANY_POSTS: str = "automation-lab/linkedin-company-posts-scraper"
+    APIFY_ACTOR_SEARCH_COMPANIES: str = "bebity/linkedin-premium-actor"
+    APIFY_ACTOR_SEARCH_PEOPLE: str = "harvestapi/linkedin-profile-search"
+    APIFY_ACTOR_PERSON_PROFILE: str = "curious_coder/linkedin-profile-scraper"
+    APIFY_ACTOR_SEND_MESSAGE: str = "curious_coder/linkedin-message-sender"
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:
