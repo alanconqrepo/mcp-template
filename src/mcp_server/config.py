@@ -74,6 +74,13 @@ class Settings(BaseSettings):
     OUTLOOK_REDIRECT_URI: str = "http://localhost:8000/auth/outlook/callback"
     OUTLOOK_TOKENS_DIR: str = ".outlook_tokens"
 
+    # DocuWare (shared service account)
+    DOCUWARE_URL: str = ""           # e.g. https://docuware.mycompany.com
+    DOCUWARE_USERNAME: str = ""
+    DOCUWARE_PASSWORD: str = ""
+    DOCUWARE_ORGANIZATION: str = ""  # DocuWare organization name
+    DOCUWARE_BLOB_PREFIX: str = "docuware/"  # blob prefix for downloaded files
+
     @model_validator(mode="after")
     def validate_oauth2_config(self) -> "Settings":
         if self.AUTH_MODE == "oauth2" and not self.OAUTH2_JWKS_URL:
