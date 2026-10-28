@@ -116,7 +116,7 @@ class Settings(BaseSettings):
 
     # LinkedIn (via Apify actors) — actor IDs are overridable without code changes
     LINKEDIN_LI_AT: str = ""  # LinkedIn session cookie for send_message
-    APIFY_ACTOR_COMPANY_INFO: str = "scrapier/linkedin-company-scraper-actor"
+    APIFY_ACTOR_COMPANY_INFO: str = "johnvc~linkedin-company-api"
     APIFY_ACTOR_COMPANY_POSTS: str = "automation-lab/linkedin-company-posts-scraper"
     APIFY_ACTOR_SEARCH_COMPANIES: str = "bebity/linkedin-premium-actor"
     APIFY_ACTOR_SEARCH_PEOPLE: str = "harvestapi/linkedin-profile-search"

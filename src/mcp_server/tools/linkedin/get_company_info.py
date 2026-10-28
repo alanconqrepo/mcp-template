@@ -27,16 +27,16 @@ async def linkedin_get_company_info(
         settings = get_settings()
         results = await run_apify_actor(
             settings.APIFY_ACTOR_COMPANY_INFO,
-            {"startUrls": [{"url": company_url}]},
+            {"companyUrls": [company_url]},
         )
-        if not results:
+        item = next((r for r in results if r.get("result_type") == "company"), None)
+        if not item:
             return {"error": "No data returned for this company URL"}
-        item = results[0]
         return {
             "name": item.get("name"),
             "linkedin_url": item.get("linkedinUrl") or company_url,
             "website": item.get("website"),
-            "industry": item.get("industry"),
+            "industry": item.get("industry") or item.get("industries"),
             "company_size": item.get("companySize") or item.get("employeeCount"),
             "headquarters": item.get("headquarters") or item.get("location"),
             "description": item.get("description"),
